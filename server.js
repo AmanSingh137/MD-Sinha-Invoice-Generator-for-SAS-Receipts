@@ -156,6 +156,8 @@ app.post("/generate", upload.single("pdf"), async (req, res) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
-app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+const server = app.listen(0, () => {
+  console.log("Server started");
 });
+
+module.exports = server;
