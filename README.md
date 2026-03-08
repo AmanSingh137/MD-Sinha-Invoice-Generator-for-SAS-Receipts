@@ -8,7 +8,9 @@
 
 As engineering environments grow more complex, the ability to combine **technical expertise with efficient processes** becomes increasingly important. At M.D. Sinha & Sons, we believe that technology should not only solve engineering problems but also streamline internal workflows.
 
-This project is an example of that philosophy.
+This project is an example of that philosophy. 
+
+To learn more about us, visit: https://www.mdsinha.co.in/
 
 ---
 
