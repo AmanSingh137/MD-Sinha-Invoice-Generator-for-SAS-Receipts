@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #fff;
+    font-size: 12px;
+    color: #000;
+  }
+
+  /* ── PAGE SHELL ── */
+  .page {
+    width: 595px;
+    min-height: 842px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    background: #fff;
+  }
+
+  /* ───────────────────────────────────────────
+     COPY LABEL  (inline top-right, Helvetica-Bold 9pt)
+  ─────────────────────────────────────────── */
+  .copy-label-inline {
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 9.1px;
+    margin-left: auto;
+  }
+
+  /* ───────────────────────────────────────────
+     COMPANY NAME  (Monotype Corsiva / cursive, ~44pt)
+     Best web-safe approximation: cursive
+  ─────────────────────────────────────────── */
+  .company-name {
+    text-align: center;
+    /* font-family: 'IM Fell English', 'Palatino Linotype', 'Book Antiqua', Georgia, serif; */
+    font-family: "Cookie";
+    font-style: italic;
+    font-size: 44px;
+    line-height: 1;
+    padding-top: 6px;
+    text-decoration: underline;
+    padding-bottom: 4px;
+  }
+
+  /* ───────────────────────────────────────────
+     COMPANY SUBTITLE  (Times New Roman, 12.7pt)
+  ─────────────────────────────────────────── */
+  .company-sub {
+    text-align: center;
+    text-decoration: underline;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12.7px;
+    line-height: 1.5;
+  }
+
+  /* ───────────────────────────────────────────
+     HR separators
+  ─────────────────────────────────────────── */
+  .hr-solid {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 5px 27px;
+  }
+
+  /* ───────────────────────────────────────────
+     REGISTRATION INFO  (Times New Roman 9.1pt, left block)
+     Left border rect from PDF: x0=24.6 thin vertical bar
+  ─────────────────────────────────────────── */
+  .reg-section {
+    display: flex;
+    margin: 0 27px;
+    position: relative;
+  }
+  .reg-border {
+    width: 2px;
+    background: #000;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  .reg-info {
+    flex: 1;
+    padding: 4px 0;
+  }
+  .reg-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1px;
+  }
+  .reg-left {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 9.1px;
+  }
+  .reg-left-bold {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 9.1px;
+    font-weight: bold;
+  }
+  .reg-right {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9.1px;
+  }
+  .reg-right-bold {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9.1px;
+    font-weight: bold;
+  }
+
+  /* ───────────────────────────────────────────
+     BODY SECTION  (margin 27px sides)
+  ─────────────────────────────────────────── */
+  .body {
+    margin: 0 27px;
+  }
+
+  /* ── TO BLOCK  (Times New Roman Bold 10.9pt) ── */
+  .to-block {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 10.9px;
+    line-height: 1.55;
+    margin-top: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* ── TAX INVOICE TITLE  (Times New Roman 16.4pt, centered) ── */
+  .invoice-title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16.4px;
+    font-weight: normal;
+    text-align: center;
+    text-decoration: underline;
+    margin: 6px 0 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── REFERENCE GRID  (Times New Roman Bold 10.9pt, two-col) ── */
+  .ref-grid {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 10.9px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1px;
+    margin-bottom: 2px;
+    line-height: 1.55;
+  }
+
+  /* ── JOB PERIOD ── */
+  .job-period {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 10.9px;
+    margin-bottom: 8px;
+    line-height: 1.55;
+  }
+
+  /* ───────────────────────────────────────────
+     ITEMS TABLE  (mixed fonts per PDF)
+     Header: Times New Roman 10.9pt
+     Serv. No col header: Helvetica 10.9pt
+  ─────────────────────────────────────────── */
+  table.items {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.items th {
+    border: 1px solid #000;
+    padding: 4px 5px;
+    font-size: 10.9px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  table.items th.tnr  { font-family: 'Times New Roman', Times, serif; }
+  table.items th.helv { font-family: Helvetica, Arial, sans-serif; }
+
+  table.items td {
+    border: 1px solid #000;
+    padding: 4px 5px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 10.9px;
+    vertical-align: top;
+  }
+  table.items td.helv-cell {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10.9px;
+  }
+  table.items td.center { text-align: center; }
+  table.items td.right  { text-align: right; }
+  table.items td.small  { font-size: 10px; }
+
+
+
+  /* ── AMOUNT IN WORDS  (Helvetica 10.9pt) ── */
+  .amount-words {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10.9px;
+    margin-top: 8px;
+  }
+
+  /* ── SIGNATURE  (Helvetica 10.9pt) ── */
+  .signature {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10.9px;
+    margin-top: 30px;
+    padding-bottom: 20px;
+  }
+
+  @media print {
+    body { margin: 0; }
+    .page { width: 100%; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="invoice-title">TAX INVOICE</div>
+  <!-- ── REGISTRATION NUMBERS (top section, left border + two-column) ── -->
+  <div class="reg-section">
+    <div class="reg-border"></div>
+    <div class="reg-info">
+      <div class="reg-row">
+        <span class="reg-left">P.F. Code No. &#8211; BR/2705</span>
+        <span class="reg-right">Cell &#8211; 9334614358</span>
+      </div>
+      <div class="reg-row">
+        <span class="reg-left">ESI No. &#8211; P/42-593-101</span>
+      </div>
+      <div class="reg-row">
+        <span class="reg-left-bold">PAN No. &#8211; AOGPS5634C</span>
+        <!-- COPY LABEL sits top-right, inline with reg section -->
+        <span class="copy-label-inline">{{copyLabel}}</span>
+      </div>
+      <div class="reg-row">
+        <span class="reg-left-bold">GST No. &#8211; 20AOGPS5634C1ZA</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── COMPANY LETTERHEAD ── -->
+  <div class="company-name">M.D.Sinha &amp; Son's</div>
+  <div class="company-sub">Electrical Engineers &amp; Govt. License Contractors</div>
+  <div class="company-sub">Shop no.10, Ground Floor, Tiwari Bechar Building, Bistupur, Jamshedpur - 831001</div>
+
+  <!-- ── BODY ── -->
+  <div class="body">
+
+    <!-- TO BLOCK -->
+    <div class="to-block">
+      <div>To</div>
+      <div>The General Manager (Finance &amp; Account's),</div>
+      <div>M/S Tata Steel Ltd., Jamshedpur.</div>
+      <div>GST No. &#8211; 20AAACT2803M2ZO</div>
+    </div>
+
+    <!-- REFERENCE FIELDS (dynamic) -->
+    <div class="ref-grid">
+      <span>GST Invoice No. &#8211; {{invoiceNo}}</span>
+      <span>WO./DO. No. &#8211; {{woDoNo}}</span>
+      <span>GST Invoice Date &#8211; {{invoiceDate}}</span>
+      <span>W.O. Date &#8211; {{woDate}}</span>
+      <span>Challan No. &#8211; {{challanNo}}</span>
+      <span>SES No. &#8211; {{sesNo}}</span>
+    </div>
+
+    <!-- JOB PERIOD (dynamic) -->
+    <div class="job-period">Job Period &#8211; {{serviceFrom}} To {{serviceTo}}.</div>
+
+    <!-- LINE ITEMS TABLE -->
+    <table class="items">
+      <thead>
+        <tr>
+          <th class="tnr"  style="width:34px;">Sl.No.</th>
+          <th class="helv" style="width:80px;">Serv.<br>No</th>
+          <th class="tnr"  style="width:50px;">SAC<br>Code</th>
+          <th class="tnr">Description</th>
+          <th class="tnr"  style="width:38px;">Qty.</th>
+          <th class="tnr"  style="width:48px;">Unit<br>Each/mtr</th>
+          <th class="tnr"  style="width:42px;">Unit<br>Rate</th>
+          <th class="tnr"  style="width:60px;">Total<br>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{rows}}
+        <!--
+          Row template (8 columns):
+          <tr>
+            <td class="center">1</td>
+            <td class="helv-cell">USCHLV01A<br>007 24</td>
+            <td class="center">998412</td>
+            <td>HIRING LMV;MAHINDRA MAXIMMO ,NO ,DAILY</td>
+            <td class="center">24</td>
+            <td class="center small">Each.</td>
+            <td class="right">780.00</td>
+            <td class="right">18720.00</td>
+          </tr>
+        -->
+
+        <!-- TOTALS: label in Description col (col 4), value in Total Amount col (col 8) -->
+        <tr>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-weight:bold;font-size:10.9px;text-align:right;border:1px solid #000;">Taxable Amount</td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-weight:bold;font-size:10px;text-align:right;border:1px solid #000;">{{taxable}}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:10.9px;text-align:right;border:1px solid #000;">CGST 6%</td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:10px;text-align:right;border:1px solid #000;">{{cgst}}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:10.9px;text-align:right;border:1px solid #000;">SGST 6%</td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:10px;text-align:right;border:1px solid #000;">{{sgst}}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:'Times New Roman',Times,serif;font-weight:bold;font-size:10.9px;text-align:right;border:1px solid #000;">NET AMOUNT</td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="border:1px solid #000;"></td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-weight:bold;font-size:10px;text-align:right;border:1px solid #000;">{{netAmount}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- AMOUNT IN WORDS -->
+    <p class="amount-words">({{amountInWords}})</p>
+
+    <!-- SIGNATURE -->
+    <div class="signature">For M.D.Sinha &amp; Sons</div>
+
+  </div><!-- /.body -->
+
+</div><!-- /.page -->
+</body>
+ <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+  <script>
+    WebFont.load({
+      google: {
+        families: ["Cookie:regular"]
+      }
+    });
+</script>
+
+</html>
