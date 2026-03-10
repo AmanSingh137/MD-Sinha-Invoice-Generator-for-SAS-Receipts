@@ -1,20 +1,187 @@
-<form action="/generate" method="post" enctype="multipart/form-data">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <label>W.O Date:</label>
-  <input type="text" name="woDate" placeholder="dd/mm/yyyy" required>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
 
-  <br><br>
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 48px;
+      width: 100%;
+      max-width: 480px;
+      animation: slideIn 0.4s ease-out;
+    }
 
-  <label>SAC: </label>
-  <input type="text" name="SAC" placeholder="SAC" required>
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  <br><br>
+    .form-header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
 
-  <label>Upload SES PDF:</label>
-  <input type="file" name="pdf" required>
+    .form-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 8px;
+    }
 
-  <br><br>
+    .form-header p {
+      font-size: 14px;
+      color: #718096;
+    }
 
-  <button type="submit">Generate Invoice</button>
+    .form-group {
+      margin-bottom: 24px;
+    }
 
-</form>
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f7fafc;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input[type="text"]::placeholder {
+      color: #a0aec0;
+    }
+
+    input[type="file"] {
+      cursor: pointer;
+      padding: 12px;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-right: 12px;
+    }
+
+    input[type="file"]::-webkit-file-upload-button:hover {
+      background: #5568d3;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      margin-top: 8px;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+    }
+
+    .file-info {
+      font-size: 12px;
+      color: #718096;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .form-container {
+        padding: 32px 24px;
+      }
+
+      .form-header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Invoice Generator</h1>
+      <p>Fill in the details to generate your invoice</p>
+    </div>
+
+    <form action="/generate" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="woDate">W.O Date</label>
+        <input type="text" id="woDate" name="woDate" placeholder="dd/mm/yyyy" required>
+      </div>
+
+      <div class="form-group">
+        <label for="SAC">SAC</label>
+        <input type="text" id="SAC" name="SAC" placeholder="Enter SAC" required>
+      </div>
+
+      <div class="form-group">
+        <label for="pdf">Upload SES PDF</label>
+        <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+        <div class="file-info">Only PDF files are accepted</div>
+      </div>
+
+      <button type="submit">Generate Invoice</button>
+    </form>
+  </div>
+</body>
+</html>
