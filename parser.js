@@ -19,7 +19,7 @@ function numberToWords(num) {
 function amountToWords(amount) {
   const [r, p] = String(amount).split(".");
   let w = "Rupees " + numberToWords(parseInt(r));
-  if (p && parseInt(p) > 0) w += " and " + numberToWords(parseInt(p)) + " Paisa ";
+  if (p && parseInt(p) > 0) w += " and " + numberToWords(parseInt(p)) + " Paisa";
   return w + " Only";
 }
 
@@ -27,57 +27,68 @@ function get(text, re) {
   return (text.match(re)?.[1] || '').trim();
 }
 
+function normaliseUnit(uom) {
+  const map = { TAG: 'Each.', M: 'Mtr.', NOS: 'Nos.', KM: 'Km', EA: 'Each.' };
+  return map[(uom || '').toUpperCase()] || uom;
+}
+
 // ── Item extraction ───────────────────────────────────────────────────────────
 //
 // pdf-parse produces each table field on its own line:
-//   "10"                                        ← item number
-//   "USCHLV01A0"                                ← serv no part 1
-//   "07"                                        ← serv no part 2
-//   "HIRING LMV;MAHINDRA MAXIMMO ,NO ,DAILY"   ← description
-//   "24.000TAG        780.00      18720.00"      ← qty+uom+rate+amount merged
+//   "10"                                       ← item number (digits only)
+//   "USCEST04A0"                               ← serv no part 1
+//   "03"                                       ← serv no part 2 (pure alphanumeric)
+//   "TELE CBL LAYNG;JELLY FILLED ARMOURED ,3"  ← description line 1
+//   "345.000M         38.00      13110.00"     ← qty+uom+rate+amount (val line)
+//
+// Description may span multiple lines before the val line.
+// Val line is identified by: starts with digits immediately followed by a UOM code.
 
 function extractItems(text) {
+  const VAL_RE  = /^([\d.]+)(TAG|KM|M|NOS|EA)\s+([\d.]+)\s+([\d.]+)/;
+  const STOP_RE = /^(Grand Total|Surcharge|Total Amount|Page)/;
+  const SERV_RE = /^[A-Z0-9]+$/;
+
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
 
-  // Find the table header line
+  // Find table header
   const headerIdx = lines.findIndex(l => l.startsWith('Item No.') && l.includes('Serv'));
   if (headerIdx === -1) return [];
 
-  const stopRe = /^(Grand Total|Surcharge|Total Amount|Page)/;
-  const dataLines = lines.slice(headerIdx + 1);
-
+  const data = lines.slice(headerIdx + 1);
   const items = [];
   let i = 0;
 
-  while (i < dataLines.length && !stopRe.test(dataLines[i])) {
+  while (i < data.length && !STOP_RE.test(data[i])) {
     // Item number: pure digits
-    if (!/^\d+$/.test(dataLines[i])) { i++; continue; }
+    if (!/^\d+$/.test(data[i])) { i++; continue; }
+    i++; // skip item number
 
-    i++; // skip item number (we use sequential sl instead)
-
-    // Serv no: one or two consecutive pure-uppercase-alphanumeric lines
+    // Serv no: one or more consecutive pure-alphanumeric lines
     let servNo = '';
-    while (i < dataLines.length && /^[A-Z0-9]+$/.test(dataLines[i])) {
-      servNo += dataLines[i];
+    while (i < data.length && SERV_RE.test(data[i])) {
+      servNo += data[i];
       i++;
     }
 
-    // Description: next non-empty line
-    const description = dataLines[i] || '';
-    i++;
+    // Description: one or more lines until we hit the val line or stop
+    const descParts = [];
+    while (i < data.length && !VAL_RE.test(data[i]) && !STOP_RE.test(data[i]) && !/^\d+$/.test(data[i])) {
+      descParts.push(data[i]);
+      i++;
+    }
+    const description = descParts.join(' ').trim();
 
-    // Values line: "24.000TAG   780.00   18720.00"
-    const valLine  = dataLines[i] || '';
-    const valMatch = valLine.match(/^([\d.]+)(TAG|KM)\s+([\d.]+)\s+([\d.]+)/);
-    i++;
+    // Val line: qty+uom+rate+amount
+    const valMatch = (data[i] || '').match(VAL_RE);
+    if (valMatch) i++;
 
     items.push({
       sl:          items.length + 1,
       servNo,
-      sac:         '998412',
       description,
       qty:         valMatch ? parseFloat(valMatch[1]).toString() : '',
-      unit:        valMatch ? (valMatch[2] === 'TAG' ? 'Each.' : 'Km') : '',
+      unit:        valMatch ? normaliseUnit(valMatch[2]) : '',
       rate:        valMatch ? valMatch[3] : '',
       amount:      valMatch ? valMatch[4] : '',
     });
@@ -89,10 +100,10 @@ function extractItems(text) {
 // ── Main parser ───────────────────────────────────────────────────────────────
 
 function parseSES(text) {
+  console.log("parseSES received:", typeof text, JSON.stringify(String(text).slice(0, 100)));
   if (!text.includes('SES Acknowledgment receipt')) {
     throw new Error(
-      'Wrong file. Please upload the SES Acknowledgment receipt from Tata Steel ' +
-      '(the document that says "SES Acknowledgment receipt" at the top).'
+      'Wrong file. Please upload the SES Acknowledgment receipt from Tata Steel.'
     );
   }
 
@@ -101,7 +112,6 @@ function parseSES(text) {
   data.invoiceNo   = "MDSSRV" + Date.now().toString().slice(-5);
   data.invoiceDate = new Date().toLocaleDateString("en-GB");
 
-  // Metadata — works on both spaced and no-space formats
   const arcNo      = get(text, /ARC No[:\s]+(\d+)/);
   data.woDoNo      = arcNo ? arcNo + "/122" : '';
   data.challanNo   = get(text, /Challan No\.[:\s]+(\d+)/);
@@ -109,7 +119,6 @@ function parseSES(text) {
   data.serviceFrom = get(text, /Service From[:\s]+(\d{2}-[A-Za-z]{3}-\d{4})/);
   data.serviceTo   = get(text, /Service To[:\s]+(\d{2}-[A-Za-z]{3}-\d{4})/);
 
-  // Grand Total — may have no space before number
   const taxable    = parseFloat(get(text, /Grand Total \(Excl taxes\)\s*([\d.]+)/) || 0);
   data.taxable     = taxable.toFixed(2);
   data.cgst        = (taxable * 0.06).toFixed(2);
@@ -124,12 +133,12 @@ function parseSES(text) {
 
 // ── Template rendering ────────────────────────────────────────────────────────
 
-function buildRows(items) {
-  return items.map(item => `
+function buildRows(items, sacCodes) {
+  return items.map((item, i) => `
     <tr>
       <td class="center">${item.sl}</td>
       <td class="helv-cell">${item.servNo}</td>
-      <td class="center">${item.sac}</td>
+      <td class="center">${sacCodes && sacCodes[i] !== undefined ? sacCodes[i] : ''}</td>
       <td>${item.description}</td>
       <td class="center">${item.qty}</td>
       <td class="center small">${item.unit}</td>
@@ -139,24 +148,4 @@ function buildRows(items) {
   ).join("\n");
 }
 
-function renderTemplate(template, data, copyLabel = "ORIGINAL FOR RECIPIENT") {
-  const rows = buildRows(data.items);
-  return template
-    .replace(/\{\{copyLabel\}\}/g,     copyLabel)
-    .replace(/\{\{invoiceNo\}\}/g,     data.invoiceNo)
-    .replace(/\{\{woDoNo\}\}/g,        data.woDoNo)
-    .replace(/\{\{invoiceDate\}\}/g,   data.invoiceDate)
-    .replace(/\{\{woDate\}\}/g,        data.woDate || '')
-    .replace(/\{\{challanNo\}\}/g,     data.challanNo)
-    .replace(/\{\{sesNo\}\}/g,         data.sesNo)
-    .replace(/\{\{serviceFrom\}\}/g,   data.serviceFrom)
-    .replace(/\{\{serviceTo\}\}/g,     data.serviceTo)
-    .replace(/\{\{rows\}\}/g,          rows)
-    .replace(/\{\{taxable\}\}/g,       data.taxable)
-    .replace(/\{\{cgst\}\}/g,          data.cgst)
-    .replace(/\{\{sgst\}\}/g,          data.sgst)
-    .replace(/\{\{netAmount\}\}/g,     data.netAmount)
-    .replace(/\{\{amountInWords\}\}/g, data.amountInWords);
-}
-
-module.exports = { parseSES, buildRows, renderTemplate };
+module.exports = { parseSES, buildRows, amountToWords };
