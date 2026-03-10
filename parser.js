@@ -99,7 +99,7 @@ function extractItems(text) {
 
 // ── Main parser ───────────────────────────────────────────────────────────────
 
-function parseSES(text) {
+function parseSES(text, cgst, sgst) {
   console.log("parseSES received:", typeof text, JSON.stringify(String(text).slice(0, 100)));
   if (!text.includes('SES Acknowledgment receipt')) {
     throw new Error(
@@ -121,9 +121,10 @@ function parseSES(text) {
 
   const taxable    = parseFloat(get(text, /Grand Total \(Excl taxes\)\s*([\d.]+)/) || 0);
   data.taxable     = taxable.toFixed(2);
-  data.cgst        = (taxable * 0.06).toFixed(2);
-  data.sgst        = (taxable * 0.06).toFixed(2);
-  data.netAmount   = (taxable * 1.12).toFixed(2);
+  data.cgst        = (taxable * cgst).toFixed(2);
+  data.sgst        = (taxable * sgst).toFixed(2);
+  const taxes    = parseFloat(data.cgst) + parseFloat(data.sgst);
+  data.netAmount = (taxable + taxes).toFixed(2);
   data.amountInWords = amountToWords(data.netAmount);
 
   data.items = extractItems(text);

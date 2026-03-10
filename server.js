@@ -45,14 +45,17 @@ app.post("/generate", upload.single("pdf"), async (req, res) => {
     // ── Parse SES ──────────────────────────────────────────────────────────
 
     let parsed;
+    let cgstEntered = (req.body.CGST || 0.06);
+    let sgstEntered = (req.body.SGST || 0.06);
     try {
-      parsed = parseSES(rawText);
+      parsed = parseSES(rawText, cgstEntered, sgstEntered);
     } catch (e) {
       return res.status(400).send(e.message);
     }
 
     parsed.woDate  = (req.body.woDate || "").trim();
     const sacCodes = (req.body.SAC || "").split(",").map(s => s.trim());
+
 
     console.log("Parsed:", JSON.stringify(parsed, null, 2));
 
@@ -81,6 +84,12 @@ app.post("/generate", upload.single("pdf"), async (req, res) => {
       }
       html = html.replaceAll("{{rows}}",      rows);
       html = html.replaceAll("{{copyLabel}}", copyLabel);
+      cgstEntered = cgstEntered * 100;
+      sgstEntered = sgstEntered * 100;
+      html = html.replaceAll("{{cgstEntered}}", cgstEntered);
+      html = html.replaceAll("{{sgstEntered}}", sgstEntered);
+      cgstEntered = cgstEntered / 100;
+      sgstEntered = sgstEntered / 100;
       return html;
     }
 
